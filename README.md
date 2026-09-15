@@ -30,9 +30,13 @@ PORT=5000
 NODE_ENV=development
 MONGO_URI=mongodb://127.0.0.1:27017/shopnest
 JWT_SECRET=super_secret_key
+GMAIL_USER=your-gmail-address@gmail.com
+GMAIL_PASS=your-16-character-gmail-app-password
 RAZORPAY_KEY_ID=your_key_id
 RAZORPAY_KEY_SECRET=your_key_secret
 ```
+
+New accounts must verify the six-digit code sent by email before they receive a login token. In production, set these environment variables in Render as well; use a Gmail App Password rather than your normal Gmail password.
 
 From the **root folder** `shopnest/`, trigger a full install across environments:
 ```bash

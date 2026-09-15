@@ -4,13 +4,12 @@ import App from './App';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import './styles/global.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <ToastProvider><AuthProvider><App /></AuthProvider></ToastProvider>
   </Provider>
 );

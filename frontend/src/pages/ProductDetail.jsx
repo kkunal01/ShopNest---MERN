@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import '../styles/product.css';
+import { ToastContext } from '../context/ToastContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+  const { notify } = useContext(ToastContext);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -34,7 +36,7 @@ const ProductDetail = () => {
         imageUrl: product.imageUrl,
         qty: 1
       }));
-      alert('Successfully added to your cart!');
+      notify('Added to your cart.');
     }
   };
 

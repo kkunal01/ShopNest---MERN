@@ -5,7 +5,8 @@ const { admin } = require('../middleware/adminMiddleware');
 
 const router = express.Router();
 
-router.route('/').post(protect, addOrderItems).get(protect, admin, getOrders);
+// Orders are created only by the verified-payment endpoint.
+router.route('/').get(protect, admin, getOrders);
 router.route('/myorders').get(protect, getMyOrders);
 router.route('/:id/status').put(protect, admin, updateOrderStatus);
 

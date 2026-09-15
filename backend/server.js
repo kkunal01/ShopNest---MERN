@@ -8,6 +8,8 @@ dotenv.config();
 connectDB();
 
 const app = express();
+// Render sits behind a proxy; this makes rate-limit use the visitor IP safely.
+app.set('trust proxy', 1);
 
 // Set CORS for frontend URL / allow single-node deploy
 app.use(cors({
@@ -22,6 +24,7 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
+app.use('/api/contact', require('./routes/contactRoutes'));
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {

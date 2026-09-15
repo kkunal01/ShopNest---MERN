@@ -7,6 +7,7 @@ const addOrderItems = async (req, res) => {
     if (items && items.length === 0) {
       return res.status(400).json({ message: 'No order items' });
     } else {
+      if (!paymentId) return res.status(400).json({ message: 'A verified payment is required to place an order' });
       const order = new Order({
         userId: req.user._id,
         items,

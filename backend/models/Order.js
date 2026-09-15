@@ -17,8 +17,8 @@ const orderSchema = new mongoose.Schema({
     postalCode: { type: String, required: true },
     country: { type: String, required: true }
   },
-  paymentId: { type: String },
-  status: { type: String, enum: ['Pending', 'Shipped', 'Delivered'], default: 'Pending' },
+  paymentId: { type: String }, razorpayOrderId: { type: String },
+  status: { type: String, enum: ['Pending payment', 'Paid', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Refunded'], default: 'Paid' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

@@ -1,14 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
 import '../styles/auth.css';
+import { ToastContext } from '../context/ToastContext';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { notify } = useContext(ToastContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,11 +20,9 @@ const Register = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Registration Successful! Please check your email for the Welcome OTP.');
-        login(data);
-        navigate('/');
+        navigate('/verify-email', { state: { email: data.email } });
       } else {
-        alert(data.message);
+        notify(data.message, 'error');
       }
     } catch (error) {
       console.error(error);

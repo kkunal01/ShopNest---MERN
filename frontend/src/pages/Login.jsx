@@ -1,12 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { ToastContext } from '../context/ToastContext';
 import '../styles/auth.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useContext(AuthContext);
+  const { notify } = useContext(ToastContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,8 +23,10 @@ const Login = () => {
       if (res.ok) {
         login(data);
         navigate('/');
+      } else if (data.requiresVerification) {
+        navigate('/verify-email', { state: { email: data.email } });
       } else {
-        alert(data.message);
+        notify(data.message, 'error');
       }
     } catch (error) {
       console.error(error);
@@ -36,6 +40,7 @@ const Login = () => {
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit" className="btn">Login</button>
+        <p><Link to="/forgot-password">Forgot password?</Link></p>
         <p>Don't have an account? <Link to="/register">Register</Link></p>
       </form>
     </div>

@@ -25,11 +25,13 @@ const Footer = () => {
         
         <div style={{ display: 'flex', gap: '20px' }}>
           <Link to="/about" style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>About Us</Link>
+          <Link to="/contact" style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Contact Us</Link>
           <Link to="/return" style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Return Policy</Link>
           <Link to="/disclaimer" style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Disclaimer</Link>
         </div>
         
         <div style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>
+          <a href="https://instagram.com" style={{ color: '#a1a1aa', marginRight: '14px' }}>Instagram</a>
           &copy; {new Date().getFullYear()} ShopNest. All rights reserved.
         </div>
       </div>

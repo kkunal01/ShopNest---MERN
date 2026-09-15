@@ -92,3 +92,6 @@ h2 {
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46; 
 }
+ .toast-stack { position: fixed; top: 82px; left: 50%; transform: translateX(-50%); z-index: 2000; display: grid; gap: 10px; width: min(420px, calc(100vw - 32px)); }
+ .toast { background: #18181b; color: #fff; border: 1px solid #27272a; border-left: 4px solid #10b981; padding: 14px 16px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+ .toast.error { border-left-color: #ef4444; }
