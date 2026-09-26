@@ -34,25 +34,59 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const cleanedEmail = normaliseEmail(email);
+    
     if (!name?.trim() || !cleanedEmail || !password || password.length < 6) {
       return res.status(400).json({ message: 'Name, a valid email, and a password of at least 6 characters are required' });
     }
     
     const userExists = await User.findOne({ email: cleanedEmail });
-    if (userExists) return res.status(400).json({ message: 'User already exists' });
+    if (userExists) {
+      // Optional: If user exists but isn't verified, you might want to resend OTP instead
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // =====================================================================
+    // OPTIONAL STRICT VALIDATION: To check if the inbox ACTUALLY exists
+    // You need a free API like AbstractAPI (abstractapi.com), Hunter.io, or ZeroBounce
+    // =====================================================================
+    /*
+    const response = await fetch(`https://emailvalidation.abstractapi.com/v1/?api_key=YOUR_API_KEY&email=${cleanedEmail}`);
+    const validationData = await response.json();
+    if (validationData.deliverability === 'UNDELIVERABLE') {
+       return res.status(400).json({ message: 'This email address does not exist.' });
+    }
+    */
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ name: name.trim(), email: cleanedEmail, password: hashedPassword, emailVerified: false });
+    // 1. Create the user
+    const user = await User.create({ 
+      name: name.trim(), 
+      email: cleanedEmail, 
+      password: hashedPassword, 
+      emailVerified: false 
+    });
+
     if (user) {
-      await createAndSendVerificationOtp(user);
-      res.status(201).json({
-        email: user.email,
-        message: 'Verification code sent. Check your email to finish creating your account.'
-      });
+      try {
+        // 2. Attempt to generate and send the OTP via EmailJS
+        await createAndSendVerificationOtp(user);
+        
+        // 3. Only send success to frontend if the email function didn't throw an error
+        return res.status(201).json({
+          email: user.email,
+          message: 'Verification code sent. Check your email to finish creating your account.'
+        });
+      } catch (emailError) {
+        // CRITICAL FIX: If sending the email fails, delete the unverified user from the DB!
+        // Otherwise, they can never register again because "User already exists"
+        await User.findByIdAndDelete(user._id);
+        console.error("Email sending failed:", emailError);
+        return res.status(400).json({ message: 'Failed to send verification email. Please check if the email address is correct.' });
+      }
     } else {
-      res.status(400).json({ message: 'Invalid user data' });
+      return res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
