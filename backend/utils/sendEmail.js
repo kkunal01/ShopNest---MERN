@@ -1,29 +1,26 @@
-const nodemailer = require('nodemailer');
+const emailjs = require('@emailjs/nodejs');
 
 const sendEmail = async ({ email, subject, message }) => {
   try {
-    const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, 
-    family: 4,   
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS, // App Password mapping
+    await emailjs.send(
+      process.env.EMAILJS_SERVICE_ID,
+      process.env.EMAILJS_TEMPLATE_ID,
+      {
+        to_email: email,       // The customer's email address
+        subject: subject,      // The email subject
+        message: message,      // The HTML or text message body
       },
-    });
+      {
+        publicKey: process.env.EMAILJS_PUBLIC_KEY,
+        privateKey: process.env.EMAILJS_PRIVATE_KEY,
+      }
+    );
 
-    const mailOptions = {
-      from: `"ShopNest Support" <${process.env.GMAIL_USER}>`,
-      to: email,
-      subject: subject,
-      html: message,
-    };
-
-    await transporter.sendMail(mailOptions);
     console.log(`Email successfully sent to ${email}`);
   } catch (error) {
-    console.error(`Failed to send email to ${email}: ${error.message}`);
+    // EmailJS errors are sometimes returned as objects, so we handle both
+    const errorMessage = error.text || error.message || error;
+    console.error(`Failed to send email to ${email}: ${errorMessage}`);
   }
 };
 
