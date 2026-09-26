@@ -1,15 +1,361 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext'; import { useNavigate, Link } from 'react-router-dom'; import '../styles/profile.css'; import '../styles/profilePremium.css';
+import { AuthContext } from '../context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import '../styles/profile.css';
+import '../styles/profilePremium.css';
+
 const Profile = () => {
-  const { user, logout, login } = useContext(AuthContext); const navigate = useNavigate(); const [tab,setTab]=useState('profile'); const [editing,setEditing]=useState(false); const [changePassword,setChangePassword]=useState(false); const [orders,setOrders]=useState([]); const [busy,setBusy]=useState(false); const [note,setNote]=useState(''); const [profile,setProfile]=useState({name:'',phone:'',avatarUrl:'',addresses:[]});
-  useEffect(()=>{if(!user)return navigate('/login');const headers={Authorization:`Bearer ${user.token}`};fetch('/api/auth/profile',{headers}).then(r=>r.json()).then(d=>setProfile(p=>({...p,...d,password:''})));fetch('/api/orders/myorders',{headers}).then(r=>r.json()).then(d=>setOrders(Array.isArray(d)?d:[]));},[user,navigate]);
-  if(!user)return null;
-  const notify=(message)=>{setNote(message);setTimeout(()=>setNote(''),3500)};
-  const save=async e=>{e.preventDefault();setBusy(true);const r=await fetch('/api/auth/profile',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${user.token}`},body:JSON.stringify({...profile,password:changePassword?profile.password:''})});const d=await r.json();setBusy(false);if(r.ok){login(d);setProfile(p=>({...p,password:''}));setEditing(false);setChangePassword(false);notify('Your profile has been updated.')}else notify(d.message||'Could not save changes.');};
-  const upload=async e=>{const file=e.target.files?.[0];if(!file)return;setBusy(true);const body=new FormData();body.append('avatar',file);const r=await fetch('/api/auth/profile/avatar',{method:'POST',headers:{Authorization:`Bearer ${user.token}`},body});const d=await r.json();setBusy(false);if(r.ok){setProfile(p=>({...p,avatarUrl:d.avatarUrl}));notify('Profile photo updated.')}else notify(d.message||'Upload failed.');};
-  const removeAddress=async id=>{const r=await fetch(`/api/auth/addresses/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${user.token}`}});if(r.ok){setProfile(p=>({...p,addresses:p.addresses.filter(a=>a._id!==id)}));notify('Address removed.');}};
-  return <main className="account-page"><section className="account-hero"><div className="avatar-wrap">{profile.avatarUrl?<img src={profile.avatarUrl} alt="Profile"/>:<span>{user.name?.charAt(0).toUpperCase()}</span>}<label title="Change profile photo"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={upload}/>✎</label></div><div><p className="eyebrow">MY ACCOUNT</p><h1>{profile.name||user.name}</h1><p>{user.email}</p></div><button className="account-logout" onClick={()=>{logout();navigate('/login')}}>Log out</button></section>{note&&<div className="account-notice">{note}</div>}<nav className="account-tabs"><button className={tab==='profile'?'active':''} onClick={()=>setTab('profile')}>Profile</button><button className={tab==='addresses'?'active':''} onClick={()=>setTab('addresses')}>Addresses ({profile.addresses?.length||0})</button><button className={tab==='orders'?'active':''} onClick={()=>setTab('orders')}>Orders ({orders.length})</button></nav>
-  <section className="account-panel">{tab==='profile'&&!editing&&<div className="profile-view"><h2>Personal information</h2><p>Your account details and contact information.</p><dl><div><dt>Full name</dt><dd>{profile.name||'Not added'}</dd></div><div><dt>Email address</dt><dd>{user.email}</dd></div><div><dt>Phone number</dt><dd>{profile.phone||'Not added'}</dd></div></dl><button className="btn" onClick={()=>setEditing(true)}>Edit profile</button></div>}{tab==='profile'&&editing&&<form className="profile-form" onSubmit={save}><div><h2>Edit personal details</h2><p>Only change details you want to update.</p></div><label>Full name<input required value={profile.name||''} onChange={e=>setProfile({...profile,name:e.target.value})}/></label><label>Email address<input value={user.email} disabled/></label><label>Phone number<input type="tel" placeholder="e.g. 9798226755" value={profile.phone||''} onChange={e=>setProfile({...profile,phone:e.target.value})}/></label><div className="form-divider"/><button type="button" className="change-password" onClick={()=>setChangePassword(!changePassword)}>{changePassword?'Cancel password change':'Change password'}</button>{changePassword&&<label>New password<input type="password" required minLength="6" placeholder="Minimum 6 characters" value={profile.password||''} onChange={e=>setProfile({...profile,password:e.target.value})}/></label>}<div className="edit-actions"><button type="button" onClick={()=>{setEditing(false);setChangePassword(false)}}>Cancel</button><button className="btn" disabled={busy}>{busy?'Saving…':'Save changes'}</button></div></form>}
-  {tab==='addresses'&&<div><div className="section-head"><div><h2>Saved addresses</h2><p>Choose a default address at checkout, or add a new one there.</p></div><Link className="btn" to="/checkout">Add address</Link></div><div className="address-grid">{profile.addresses?.length?profile.addresses.map(a=><article className="address-card" key={a._id}>{a.isDefault&&<b>DEFAULT</b>}<h3>{a.label}</h3><p>{a.fullName}<br/>{a.street}{a.landmark&&`, ${a.landmark}`}<br/>{a.city}{a.state&&`, ${a.state}`} — {a.postalCode}<br/>{a.country}<br/>{a.phone}</p><button onClick={()=>removeAddress(a._id)}>Remove</button></article>):<div className="empty-state"><h3>No saved addresses yet</h3><p>Add one during checkout and it will appear here.</p><Link className="btn" to="/checkout">Go to checkout</Link></div>}</div></div>}
-  {tab==='orders'&&<div><h2>Order history</h2><div className="orders-list">{orders.length?orders.map(o=><article key={o._id}><div><b>Order #{o._id.slice(-8).toUpperCase()}</b><p>{new Date(o.createdAt).toLocaleDateString()}</p></div><strong>₹{o.totalAmount.toFixed(2)}</strong><span>{o.status}</span></article>):<div className="empty-state"><h3>No orders yet</h3><Link className="btn" to="/shop">Start shopping</Link></div>}</div></div>}</section></main>;
-}; export default Profile;
+  const { user, logout, login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [tab, setTab] = useState('profile');
+  const [editing, setEditing] = useState(false);
+  const [changePassword, setChangePassword] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState('');
+  const [profile, setProfile] = useState({
+    name: '',
+    phone: '',
+    avatarUrl: '',
+    addresses: []
+  });
+
+  useEffect(() => {
+    if (!user) return navigate('/login');
+
+    const headers = { Authorization: `Bearer ${user.token}` };
+
+    fetch('/api/auth/profile', { headers })
+      .then((r) => r.json())
+      .then((d) => setProfile((p) => ({ ...p, ...d, password: '' })));
+
+    fetch('/api/orders/myorders', { headers })
+      .then((r) => r.json())
+      .then((d) => setOrders(Array.isArray(d) ? d : []));
+  }, [user, navigate]);
+
+  if (!user) return null;
+
+  const notify = (message) => {
+    setNote(message);
+    setTimeout(() => setNote(''), 3500);
+  };
+
+  const save = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+
+    const r = await fetch('/api/auth/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`
+      },
+      body: JSON.stringify({
+        ...profile,
+        password: changePassword ? profile.password : ''
+      })
+    });
+
+    const d = await r.json();
+    setBusy(false);
+
+    if (r.ok) {
+      login(d);
+      setProfile((p) => ({ ...p, password: '' }));
+      setEditing(false);
+      setChangePassword(false);
+      notify('Your profile has been updated.');
+    } else {
+      notify(d.message || 'Could not save changes.');
+    }
+  };
+
+  const upload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setBusy(true);
+    const body = new FormData();
+    body.append('avatar', file);
+
+    const r = await fetch('/api/auth/profile/avatar', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${user.token}` },
+      body
+    });
+
+    const d = await r.json();
+    setBusy(false);
+
+    if (r.ok) {
+      setProfile((p) => ({ ...p, avatarUrl: d.avatarUrl }));
+      notify('Profile photo updated.');
+    } else {
+      notify(d.message || 'Upload failed.');
+    }
+  };
+
+  const removeAddress = async (id) => {
+    const r = await fetch(`/api/auth/addresses/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${user.token}` }
+    });
+
+    if (r.ok) {
+      setProfile((p) => ({
+        ...p,
+        addresses: p.addresses.filter((a) => a._id !== id)
+      }));
+      notify('Address removed.');
+    }
+  };
+
+  return (
+    <main className="account-page">
+      <section className="account-hero">
+        <div className="avatar-wrap">
+          {profile.avatarUrl ? (
+            <img src={profile.avatarUrl} alt="Profile" />
+          ) : (
+            <span>{user.name?.charAt(0).toUpperCase()}</span>
+          )}
+          <label title="Change profile photo">
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={upload}
+            />
+            ✎
+          </label>
+        </div>
+
+        <div>
+          <p className="eyebrow">MY ACCOUNT</p>
+          <h1>{profile.name || user.name}</h1>
+          <p>{user.email}</p>
+        </div>
+
+        <button
+          className="account-logout"
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+        >
+          Log out
+        </button>
+      </section>
+
+      {note && <div className="account-notice">{note}</div>}
+
+      <nav className="account-tabs">
+        <button
+          className={tab === 'profile' ? 'active' : ''}
+          onClick={() => setTab('profile')}
+        >
+          Profile
+        </button>
+        <button
+          className={tab === 'addresses' ? 'active' : ''}
+          onClick={() => setTab('addresses')}
+        >
+          Addresses ({profile.addresses?.length || 0})
+        </button>
+        <button
+          className={tab === 'orders' ? 'active' : ''}
+          onClick={() => setTab('orders')}
+        >
+          Orders ({orders.length})
+        </button>
+      </nav>
+
+      <section className="account-panel">
+        {/* Profile View Mode */}
+        {tab === 'profile' && !editing && (
+          <div className="profile-view">
+            <h2>Personal information</h2>
+            <p>Your account details and contact information.</p>
+            <dl>
+              <div>
+                <dt>Full name</dt>
+                <dd>{profile.name || 'Not added'}</dd>
+              </div>
+              <div>
+                <dt>Email address</dt>
+                <dd>{user.email}</dd>
+              </div>
+              <div>
+                <dt>Phone number</dt>
+                <dd>{profile.phone || 'Not added'}</dd>
+              </div>
+            </dl>
+            <button className="btn" onClick={() => setEditing(true)}>
+              Edit profile
+            </button>
+          </div>
+        )}
+
+        {/* Profile Edit Mode */}
+        {tab === 'profile' && editing && (
+          <form className="profile-form" onSubmit={save}>
+            <div>
+              <h2>Edit personal details</h2>
+              <p>Only change details you want to update.</p>
+            </div>
+
+            <label>
+              Full name
+              <input
+                required
+                value={profile.name || ''}
+                onChange={(e) =>
+                  setProfile({ ...profile, name: e.target.value })
+                }
+              />
+            </label>
+
+            <label>
+              Email address
+              <input value={user.email} disabled />
+            </label>
+
+            <label>
+              Phone number
+              <input
+                type="tel"
+                placeholder="e.g. 9798226755"
+                value={profile.phone || ''}
+                onChange={(e) =>
+                  setProfile({ ...profile, phone: e.target.value })
+                }
+              />
+            </label>
+
+            <div className="form-divider" />
+
+            <button
+              type="button"
+              className="change-password"
+              onClick={() => setChangePassword(!changePassword)}
+            >
+              {changePassword ? 'Cancel password change' : 'Change password'}
+            </button>
+
+            {changePassword && (
+              <label>
+                New password
+                <input
+                  type="password"
+                  required
+                  minLength="6"
+                  placeholder="Minimum 6 characters"
+                  value={profile.password || ''}
+                  onChange={(e) =>
+                    setProfile({ ...profile, password: e.target.value })
+                  }
+                />
+              </label>
+            )}
+
+            <div className="edit-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditing(false);
+                  setChangePassword(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button className="btn" disabled={busy}>
+                {busy ? 'Saving…' : 'Save changes'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Addresses Tab */}
+        {tab === 'addresses' && (
+          <div>
+            <div className="section-head">
+              <div>
+                <h2>Saved addresses</h2>
+                <p>
+                  Choose a default address at checkout, or add a new one there.
+                </p>
+              </div>
+              <Link className="btn" to="/checkout">
+                Add address
+              </Link>
+            </div>
+
+            <div className="address-grid">
+              {profile.addresses?.length ? (
+                profile.addresses.map((a) => (
+                  <article className="address-card" key={a._id}>
+                    {a.isDefault && <b>DEFAULT</b>}
+                    <h3>{a.label}</h3>
+                    <p>
+                      {a.fullName}
+                      <br />
+                      {a.street}
+                      {a.landmark && `, ${a.landmark}`}
+                      <br />
+                      {a.city}
+                      {a.state && `, ${a.state}`} — {a.postalCode}
+                      <br />
+                      {a.country}
+                      <br />
+                      {a.phone}
+                    </p>
+                    <button onClick={() => removeAddress(a._id)}>Remove</button>
+                  </article>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <h3>No saved addresses yet</h3>
+                  <p>Add one during checkout and it will appear here.</p>
+                  <Link className="btn" to="/checkout">
+                    Go to checkout
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Orders Tab */}
+        {tab === 'orders' && (
+          <div>
+            <h2>Order history</h2>
+            <div className="orders-list">
+              {orders.length ? (
+                orders.map((o) => (
+                  <article key={o._id}>
+                    <div>
+                      <b>Order #{o._id.slice(-8).toUpperCase()}</b>
+                      <p>{new Date(o.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <strong>₹{o.totalAmount.toFixed(2)}</strong>
+                    <span>{o.status}</span>
+                  </article>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <h3>No orders yet</h3>
+                  <Link className="btn" to="/shop">
+                    Start shopping
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+};
+
+export default Profile;

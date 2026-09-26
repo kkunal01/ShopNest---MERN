@@ -1,2 +1,58 @@
-import React,{useEffect,useState}from 'react'; import {Link} from 'react-router-dom'; import ProductCard from '../components/ProductCard'; import '../styles/product.css';
-export default function Home(){const [products,setProducts]=useState([]);const [loading,setLoading]=useState(true);useEffect(()=>{fetch('/api/products').then(r=>r.json()).then(d=>setProducts(Array.isArray(d)?d:[])).finally(()=>setLoading(false));},[]);const groups=products.reduce((all,p)=>{(all[p.category]??=[]).push(p);return all;},{});return <main className="home-container"><section className="hero-banner"><p className="hero-kicker">CURATED FOR EVERYDAY</p><h1>Find your next favourite thing.</h1><p>Thoughtful products, clear prices, and a checkout you can trust.</p><Link className="btn" to="/shop">Shop all products</Link></section>{loading?<p>Loading products…</p>:Object.entries(groups).map(([category,items])=>items.length>0&&<section className="home-category" key={category}><div className="category-head"><div><p>{items.length} PRODUCTS</p><h2>{category}</h2></div><Link to={`/shop?category=${encodeURIComponent(category)}`}>View all →</Link></div><div className="product-grid home-grid">{items.slice(0,4).map(product=><ProductCard key={product._id} product={product}/>)}</div></section>)}</main>}
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import ProductCard from '../components/ProductCard';
+import '../styles/product.css';
+
+export default function Home() {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/products')
+            .then(r => r.json())
+            .then(d => setProducts(Array.isArray(d) ? d : []))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const groups = products.reduce((all, p) => {
+        (all[p.category] ??= []).push(p);
+        return all;
+    }, {});
+
+    return (
+        <main className="home-container">
+            <section className="hero-banner">
+                <p className="hero-kicker">CURATED FOR EVERYDAY</p>
+                <h1>Find your next favourite thing.</h1>
+                <p>Thoughtful products, clear prices, and a checkout you can trust.</p>
+                <Link className="btn" to="/shop">Shop all products</Link>
+            </section>
+
+            {loading ? (
+                <p>Loading products…</p>
+            ) : (
+                Object.entries(groups).map(([category, items]) => (
+                    items.length > 0 && (
+                        <section className="home-category" key={category}>
+                            <div className="category-head">
+                                <div>
+                                    <p>{items.length} PRODUCTS</p>
+                                    <h2>{category}</h2>
+                                </div>
+                                <Link to={`/shop?category=${encodeURIComponent(category)}`}>
+                                    View all →
+                                </Link>
+                            </div>
+                            
+                            <div className="product-grid home-grid">
+                                {items.slice(0, 4).map(product => (
+                                    <ProductCard key={product._id} product={product} />
+                                ))}
+                            </div>
+                        </section>
+                    )
+                ))
+            )}
+        </main>
+    );
+}
