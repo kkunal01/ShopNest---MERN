@@ -88,48 +88,6 @@ const curatedProducts = [
     numReviews: 41
   },
 
-  // --- HOME ---
-  {
-    name: 'Ceramic Coffee Mug',
-    category: 'Home',
-    description: 'Handcrafted ceramic mug perfect for your morning coffee or evening tea.',
-    price: 18.50,
-    stock: 60,
-    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a12508d9af24?auto=format&fit=crop&w=800&q=80',
-    ratings: 4.9,
-    numReviews: 156
-  },
-  {
-    name: 'Indoor Potted Succulent',
-    category: 'Home',
-    description: 'Low-maintenance indoor succulent plant with a modern decorative pot.',
-    price: 24.99,
-    stock: 18,
-    imageUrl: 'https://images.unsplash.com/photo-1485955900006-d0928e62f441?auto=format&fit=crop&w=800&q=80',
-    ratings: 4.6,
-    numReviews: 29
-  },
-  {
-    name: 'Modern Desk Lamp',
-    category: 'Home',
-    description: 'Sleek, adjustable LED desk lamp to brighten your home office workspace.',
-    price: 55.00,
-    stock: 25,
-    imageUrl: 'https://images.unsplash.com/photo-1507473884814-14407b8b2848?auto=format&fit=crop&w=800&q=80',
-    ratings: 4.5,
-    numReviews: 63
-  },
-  {
-    name: 'Minimalist Wall Clock',
-    category: 'Home',
-    description: 'Silent sweep wall clock with a clean, Scandinavian-inspired design.',
-    price: 34.00,
-    stock: 45,
-    imageUrl: 'https://images.unsplash.com/photo-1563861826100-9cb868fd110c?auto=format&fit=crop&w=800&q=80',
-    ratings: 4.4,
-    numReviews: 18
-  },
-
   // --- BEAUTY ---
   {
     name: 'Vitamin C Face Serum',
@@ -142,16 +100,6 @@ const curatedProducts = [
     numReviews: 312
   },
   {
-    name: 'Luxury Perfume Mist',
-    category: 'Beauty',
-    description: 'Elegant floral perfume mist featuring notes of jasmine and sandalwood.',
-    price: 89.99,
-    stock: 12,
-    imageUrl: 'https://images.unsplash.com/photo-1594035987158-b61763ef8bce?auto=format&fit=crop&w=800&q=80',
-    ratings: 4.7,
-    numReviews: 104
-  },
-  {
     name: 'Matte Red Lipstick',
     category: 'Beauty',
     description: 'Long-lasting, highly pigmented matte lipstick for a bold everyday look.',
@@ -161,17 +109,6 @@ const curatedProducts = [
     ratings: 4.5,
     numReviews: 67
   },
-  {
-    name: 'Hydrating Body Lotion',
-    category: 'Beauty',
-    description: 'Rich moisturizing cream that leaves skin feeling soft and deeply nourished.',
-    price: 28.00,
-    stock: 35,
-    imageUrl: 'https://images.unsplash.com/photo-1611078566160-c3be2e30fbb8?auto=format&fit=crop&w=800&q=80',
-    ratings: 4.8,
-    numReviews: 145
-  },
-
   // --- SPORTS ---
   {
     name: 'Non-Slip Yoga Mat',
@@ -204,14 +141,74 @@ const curatedProducts = [
     numReviews: 76
   },
   {
-    name: 'Professional Running Shoes',
-    category: 'Sports',
-    description: 'Lightweight running shoes with responsive cushioning for your daily miles.',
-    price: 135.00,
-    stock: 28,
-    imageUrl: 'https://images.unsplash.com/photo-1608231387042-66d1f73d98fb?auto=format&fit=crop&w=800&q=80',
+    name: 'Pro Wireless Earbuds',
+    category: 'Electronics',
+    description: 'Sweat-resistant true wireless earbuds with spatial audio and a wireless charging case.',
+    price: 149.99,
+    stock: 65,
+    imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80',
     ratings: 4.6,
-    numReviews: 95
+    numReviews: 312
+  },
+  {
+    name: 'High-Capacity Power Bank',
+    category: 'Electronics',
+    description: '20,000mAh portable charger capable of fast-charging two devices simultaneously.',
+    price: 45.99,
+    stock: 120,
+    imageUrl: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=800&q=80',
+    ratings: 4.7,
+    numReviews: 455
+  },
+  {
+    name: 'Waterproof Bluetooth Speaker',
+    category: 'Electronics',
+    description: 'Rugged, IPX7 waterproof portable speaker with 360-degree sound and rich bass.',
+    price: 79.99,
+    stock: 45,
+    imageUrl: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=800&q=80',
+    ratings: 4.5,
+    numReviews: 188
+  },
+  {
+    name: 'Tablet Pro 11-inch',
+    category: 'Electronics',
+    description: 'Powerful tablet featuring an octa-core processor, vivid display, and stylus support for creatives.',
+    price: 649.00,
+    stock: 18,
+    imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800&q=80',
+    ratings: 4.9,
+    numReviews: 276
+  },
+  {
+    name: 'Ergonomic Wireless Mouse',
+    category: 'Electronics',
+    description: 'Vertical ergonomic mouse designed to reduce wrist strain during long hours of work.',
+    price: 39.99,
+    stock: 85,
+    imageUrl: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+    ratings: 4.4,
+    numReviews: 112
+  },
+  {
+    name: 'Smart Home Hub Speaker',
+    category: 'Electronics',
+    description: 'Voice-controlled smart speaker that connects and controls all your compatible smart home devices.',
+    price: 99.00,
+    stock: 35,
+    imageUrl: 'https://images.unsplash.com/photo-1558089687-f282ffcbc126?auto=format&fit=crop&w=800&q=80',
+    ratings: 4.6,
+    numReviews: 204
+  },
+  {
+    name: 'Foldable 4K Drone',
+    category: 'Electronics',
+    description: 'Compact, foldable drone with 3-axis gimbal and 4K camera for cinematic aerial photography.',
+    price: 599.00,
+    stock: 8,
+    imageUrl: 'https://images.unsplash.com/photo-1507582020474-9a35b7d455d9?auto=format&fit=crop&w=800&q=80',
+    ratings: 4.7,
+    numReviews: 63
   }
 ];
 
